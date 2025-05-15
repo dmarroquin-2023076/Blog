@@ -1,42 +1,112 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Estilos personalizados adicionales */
+
+/* Estilos generales */
+body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.container {
+  max-width: 1140px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/* Cards */
 .card {
-  padding: 2em;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Botones */
+.btn {
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background-color: #4361ee;
+  border-color: #4361ee;
+}
+
+.btn-primary:hover {
+  background-color: #3a56d4;
+  border-color: #3a56d4;
+}
+
+.btn-outline-primary {
+  color: #4361ee;
+  border-color: #4361ee;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4361ee;
+  border-color: #4361ee;
+}
+
+/* Filtros */
+.filter-bar {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+/* Comentarios */
+.comment-list .card {
+  margin-bottom: 15px;
+}
+
+.avatar-placeholder {
+  font-weight: bold;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.publication-list, .comment-list {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filter-bar .btn-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filter-bar .btn-group .btn {
+    margin-bottom: 5px;
+    border-radius: 4px !important;
+  }
+  
+  .filter-bar .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .filter-bar select {
+    width: 100% !important;
+    margin-top: 10px;
+  }
 }
