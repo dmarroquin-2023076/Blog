@@ -60,7 +60,7 @@ export const createCommentValidator = [
     .custom(existName),
   body('content', 'Content is required')
     .notEmpty()
-    .isLength({ min: 5 }).withMessage('Content must be at least 5 characters long'),
+    .isLength({ min: 1 }).withMessage('Content must be at least 1 characters long'),
 
   body('publicationId', 'Publication ID is required')
     .notEmpty()
