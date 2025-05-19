@@ -1,69 +1,61 @@
-import React, { useState } from 'react'
-import { saveComment } from '../services/api'
+import React, { useState } from 'react';
+import { saveComment } from '../services/api';
 
 function CommentForm({ publicationId, onCommentAdded }) {
   const [userName, setUserName] = useState('')
   const [content, setContent] = useState('')
   const [errors, setErrors] = useState({})
+  const [submitMessage, setSubmitMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' })
 
   const validate = () => {
     const newErrors = {}
-    
-    if (!userName.trim()) {
-      newErrors.userName = 'El nombre es obligatorio'
+    if (!userName.trim() || userName.trim().length < 3) {
+      newErrors.userName = 'El nombre debe tener al menos 3 caracteres'
     }
-    
-    if (!content.trim()) {
+    if (!content.trim() || content.trim().length < 1) {
       newErrors.content = 'El comentario no puede estar vacío'
-    } else if (content.length < 3) {
-      newErrors.content = 'El comentario debe tener al menos 3 caracteres'
     }
-    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
     if (!validate()) return
-    
+
     setIsSubmitting(true)
-    setSubmitMessage({ type: '', text: '' })
-    
+    setSubmitMessage('')
+    setErrors({})
+
+    const commentData = {
+      userName: userName.trim(),
+      content: content.trim(),
+      publicationId,
+    }
+
     try {
-      const commentData = {
-        userName,
-        content,
-        publicationId
-      }
-      
-      const response = await saveComment(commentData)
-      
-      if (response.success) {
-        setUserName('')
-        setContent('')
-        setSubmitMessage({ 
-          type: 'success', 
-          text: 'Comentario agregado correctamente' 
-        })
-        
-        if (onCommentAdded) {
-          onCommentAdded(response.comment)
-        }
-      } else {
-        setSubmitMessage({ 
-          type: 'danger', 
-          text: 'Error al agregar comentario: ' + response.message 
-        })
-      }
+      const result = await saveComment(commentData)
+
+      setUserName('')
+      setContent('')
+      setErrors({})
+      setSubmitMessage('Comentario agregado correctamente')
+      if (onCommentAdded) onCommentAdded(result.comment)
+
     } catch (error) {
-      setSubmitMessage({ 
-        type: 'danger', 
-        text: 'Error al enviar el comentario: ' + (error.response?.data?.message || error.message) 
-      })
+      
+      if (error.response?.status === 400 && error.response.data?.errors) {
+        const validationErrors = error.response.data.errors
+        const fieldErrors = {}
+        validationErrors.forEach(err => {
+          fieldErrors[err.param] = err.msg
+        })
+        setErrors(fieldErrors)
+        setSubmitMessage('Corrige los errores en el formulario')
+      } else {
+        setSubmitMessage(error.response?.data?.message || 'Error al guardar el comentario')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -71,59 +63,40 @@ function CommentForm({ publicationId, onCommentAdded }) {
 
   return (
     <div className="card mb-4">
-      <div className="card-header bg-light">
-        <h5 className="mb-0">Añadir un comentario</h5>
-      </div>
+      <div className="card-header bg-light"><h5>Añadir un comentario</h5></div>
       <div className="card-body">
-        {submitMessage.text && (
-          <div className={`alert alert-${submitMessage.type} alert-dismissible fade show`} role="alert">
-            {submitMessage.text}
-            <button type="button" className="btn-close" onClick={() => setSubmitMessage({ type: '', text: '' })}></button>
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
+        {submitMessage && <div className="alert alert-info">{submitMessage}</div>}
+        <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
-            <label htmlFor="userName" className="form-label">Nombre</label>
+            <label htmlFor="userName" className="form-label">Nombre *</label>
             <input
+              id="userName"
               type="text"
               className={`form-control ${errors.userName ? 'is-invalid' : ''}`}
-              id="userName"
               value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder="Tu nombre"
+              onChange={e => setUserName(e.target.value)}
+              disabled={isSubmitting}
+              required
+              minLength={3}
             />
-            {errors.userName && (
-              <div className="invalid-feedback">{errors.userName}</div>
-            )}
+            {errors.userName && <div className="invalid-feedback">{errors.userName}</div>}
           </div>
-          
           <div className="mb-3">
-            <label htmlFor="content" className="form-label">Comentario</label>
+            <label htmlFor="content" className="form-label">Comentario *</label>
             <textarea
-              className={`form-control ${errors.content ? 'is-invalid' : ''}`}
               id="content"
-              rows="3"
+              className={`form-control ${errors.content ? 'is-invalid' : ''}`}
+              rows={3}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Escribe tu comentario aquí..."
-            ></textarea>
-            {errors.content && (
-              <div className="invalid-feedback">{errors.content}</div>
-            )}
+              onChange={e => setContent(e.target.value)}
+              disabled={isSubmitting}
+              required
+              minLength={1}
+            />
+            {errors.content && <div className="invalid-feedback">{errors.content}</div>}
           </div>
-          
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Enviando...
-              </>
-            ) : 'Publicar comentario'}
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? 'Enviando...' : 'Publicar comentario'}
           </button>
         </form>
       </div>
