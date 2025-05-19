@@ -9,11 +9,16 @@ export const existTitle = async (title) => {
     }
 }
 
-export const isValidPublicationId = (id) => {
+export const isValidPublicationId = async (id) => {
     if (!mongoose.isValidObjectId(id)) {
-        throw new Error('El ID de la publicación no es válido')
+        throw new Error('El ID de la publicación no es válido');
     }
-    return true
+    const publication = await Publication.findById(id);
+    if (!publication) {
+        throw new Error('La publicación no existe');
+    }
+    
+    return true;
 }
 
 export const existName = async (userName) => {
