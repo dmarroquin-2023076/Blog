@@ -49,6 +49,7 @@ export const saveComment = async (commentData) => {
   }
 }
 
+
 export const getCommentsByPublication = async (publicationId) => {
   try {
     const response = await axios.get(`/comment/getCommentsWithPublication`, {
@@ -70,3 +71,4 @@ export const getPublicationWithComments = async (publicationId) => {
     throw error
   }
 }
+
